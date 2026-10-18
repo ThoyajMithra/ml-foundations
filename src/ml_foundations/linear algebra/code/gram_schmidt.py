@@ -1,5 +1,5 @@
 from vector import Vector
-from martix import Matrix
+from matrix import Matrix
 
 
 def is_linearly_independent(vectors):
