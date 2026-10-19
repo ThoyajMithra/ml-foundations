@@ -24,7 +24,7 @@ class Vector:
 
 class Matrix:
     def __init__(self, data):
-        self.data = [list(row) for row in data]
+        self.data = [list(row) for row in data if row]
         self.rows = len(self.data)
         self.cols = len(self.data[0])
         self.shape = (self.rows, self.cols)
@@ -45,6 +45,14 @@ class Matrix:
             for i in range(self.rows)
         ])
 
+    def scalar_division(self, scalar):
+            if(scalar==0):
+                raise ValueError("can't divide with zero")
+            return Matrix([
+                [self.data[i][j] / scalar for j in range(self.cols)]
+                for i in range(self.rows)
+            ])
+    
     def scalar_multiply(self, scalar):
         return Matrix([
             [self.data[i][j] * scalar for j in range(self.cols)]
@@ -57,7 +65,7 @@ class Matrix:
             for i in range(self.rows)
         ])
 
-    def matmul(self, other):
+    def __matmul__(self, other):
         return Matrix([
             [
                 sum(self.data[i][k] * other.data[k][j] for k in range(self.cols))
@@ -97,9 +105,52 @@ class Matrix:
             [-self.data[1][0] / det, self.data[0][0] / det]
         ])
 
+    def inverse(self):
+        det=self.determinant()
+        if(det==0):
+            raise ValueError("Matrix is singular")
+
+        if(self.shape==(2,2)):
+            return self.inverse_2x2()
+
+        adj=self.zeors()
+        for r in range(self.cols):
+            for i in range(self.rows):
+                
+                minor=Matrix([
+                    [self.data[j][k] for k in range(self.cols) if k!=i and j!=r]
+                    for j in range(0,self.rows)
+                ])
+
+                adj.data[i][r]= (((-1)**(i))*((-1)**(r))) * minor.determinant()
+
+        return adj.scalar_division(det)
+
+    def zeors(self):
+            return Matrix([
+                [0 if i == j else 0 for j in range(self.rows)]
+                for i in range(self.cols)
+            ])
+
+
     @staticmethod
     def identity(n):
         return Matrix([
             [1 if i == j else 0 for j in range(n)]
             for i in range(n)
         ])
+
+if __name__=="__main__":
+
+    import random
+
+    inputs = Matrix([0.5, 0.8, 0.2])
+    weights = Matrix([
+        [random.uniform(-1, 1) for _ in range(3)]
+        for _ in range(2)
+    ])
+    bias = Matrix([[0.1], [0.1]])
+
+    print(weights)
+    print(inputs)
+    print(weights @ inputs)
