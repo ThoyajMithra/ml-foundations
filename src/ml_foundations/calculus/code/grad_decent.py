@@ -1,0 +1,14 @@
+from partial_der import numerical_gradient
+
+def f_2d(point):
+    x, y = point
+    return x**2 + y**2
+
+point = [4.0, 3.0]
+lr = 0.1
+for step in range(30):
+    grad = numerical_gradient(f_2d, point)
+    point = [p - lr * g for p, g in zip(point, grad)]
+    loss = f_2d(point)
+    if step % 5 == 0 or step == 29:
+        print(f"step {step:2d}  point=({point[0]:7.4f}, {point[1]:7.4f})  f={loss:.6f}")
